@@ -92,6 +92,7 @@ def group_oclock(date, df=oclock_df):
         x = 0
 
     df = df.groupby('渠道1')['实付'].sum().to_frame()
+    df.to_excel('C:\\Users\\W\\Desktop\\s.xlsx')
     df['日期'] = flag
     df.rename(columns={'实付': '数值'}, inplace=True)
     df = df.reset_index()
@@ -123,8 +124,7 @@ def team_oclock(date, df=oclock_df):
     # 将渠道项中 团购设置为大众
     df.loc[df.渠道.str.contains('团购'), '渠道3'] = '大众'
 
-    if 'flag' in df.columns:
-        df1 = df.loc[df['flag'] == 1].groupby('所属组').sum()['实付'].to_frame()
+    df1 = df.groupby('所属组').sum()['实付'].to_frame()
     df1['日期'] = flag
     df1.rename(columns={'实付': '数值'}, inplace=True)
     df1 = df1.reset_index()

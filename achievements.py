@@ -39,7 +39,6 @@ achievements_df['flag'] = achievements_df.apply(fun, axis=1)
 achievements_df['是否本月'] = achievements_df.apply(lambda x: pd.to_datetime(x['结账时间']).month == my_global.this_month,
                                                 axis=1)
 
-# achievements_df.to_excel('C:\\Users\\W\\Desktop\\s.xlsx')
 # 导入去年同期数据(需要更改文件名)
 achievements_df_last_year = pd.read_excel('E:\\data\\7. other\\下载数据导入\\去年\\业绩查询21_05.xlsx')
 # 导入19年同期数据(需要更改文件名)
