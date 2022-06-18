@@ -147,13 +147,7 @@ def team_achievements(date, df=achievements_df):
     """
 
     flag, df = judgement_arrive(date, df)
-    # df.to_excel('C:\\Users\\W\\Desktop\\s.xlsx')
-    if 'flag' in df.columns:
-        df = df.loc[df['flag'] == 1].groupby('所属组').sum()['实付'].to_frame()
-        # print('进来了1')
-    else:
-        df = df.groupby('所属组').sum()['实付'].to_frame()
-        # print('进来了0')
+    df = df.groupby('所属组').sum()['实付'].to_frame()
     df['类别'] = '新客业绩'
     df['日期'] = flag
     df.rename(columns={'实付': '数值'}, inplace=True)
@@ -167,7 +161,6 @@ def employee_achievements():
     个人业绩
     :return:
     """
-    # df = achievements_df.loc[achievements_df['flag'] == 1]
     df = achievements_df.loc[achievements_df['是否本月'] == True]
     df = df.pivot_table(
         index=['所属渠道', '所属组', '客服姓名'],
@@ -181,4 +174,17 @@ def employee_achievements():
     print('个人业绩数据读取成功')
     return df
 
-# team_achievements('this_month')
+
+def employee_achievements_zhou(date, df=achievements_df):
+    """
+    个人业绩周统计
+    :return:
+    """
+    flag, df = judgement_arrive(date, df)
+    df = df.groupby('客服姓名').sum()['实付'].to_frame()
+    df['类别'] = '新客业绩'
+    df['日期'] = flag
+    df.rename(columns={'实付': '数值'}, inplace=True)
+    df = df.reset_index()
+    print('个人业绩周统计数据读取成功')
+    return df

@@ -140,10 +140,10 @@ def team_register(date, df=register_df):
     """
 
     flag, df = judgement_arrive(date, df)
-    if 'flag' in df.columns:
-        df = df.loc[df['flag'] == 1].groupby('所属组').count()['电话'].to_frame()
-    else:
-        df = df.groupby('所属组').count()['电话'].to_frame()
+    # if 'flag' in df.columns:
+    #     df = df.loc[df['flag'] == 1].groupby('所属组').count()['电话'].to_frame()
+    # else:
+    df = df.groupby('所属组').count()['电话'].to_frame()
     df['类别'] = '建档人数'
     df['日期'] = flag
     df.rename(columns={'电话': '数值'}, inplace=True)

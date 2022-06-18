@@ -67,6 +67,9 @@ if __name__ == '__main__':
     grouped_team_achievements_lw = achievements.team_achievements('last_week')
     grouped_team_achievements_ly = achievements.team_achievements('last_year', achievements.achievements_df_last_year)
     grouped_team_achievements_19 = achievements.team_achievements('19_year', achievements.achievements_df_19_year)
+    # 个人业绩周环比
+    employee_achievements_zhou_tw = achievements.employee_achievements_zhou('this_week')
+    employee_achievements_zhou_lw = achievements.employee_achievements_zhou('last_week')
     # 个人业绩
     grouped_employee_achievements = achievements.employee_achievements().reset_index()
 
@@ -105,6 +108,8 @@ if __name__ == '__main__':
                     grouped_team_consult_n, grouped_team_consult_y, grouped_team_consult_tw, grouped_team_consult_lw,
                     grouped_team_consult_ly, grouped_team_consult_19]
 
+    achievements_merges1 = [employee_achievements_zhou_tw, employee_achievements_zhou_lw]
+
     # 渠道统计
     group_merge_df1 = pd.concat(group_merges1)
     group_merge_df1 = group_merge_df1.pivot_table(
@@ -121,42 +126,51 @@ if __name__ == '__main__':
         columns=['日期']
     ).reset_index()
 
+    # 个人周业绩统计
+    achievements_merge_df1 = pd.concat(achievements_merges1)
+    achievements_merge_df1 = achievements_merge_df1.pivot_table(
+        index=['客服姓名', '类别'],
+        values=['数值', '日期'],
+        columns=['日期']
+    ).reset_index()
+
     # 嘭嘭针统计
     pengpeng = arrive.employee_arrive_pengpeng()
 
     wb = xw.Book()
+
     group = wb.sheets['Sheet1']
-    group.name = '渠道统计'
-    group.range('A1').value = group_merge_df1
+    group.name = '个人数据周统计'
+    group.range('A1').value = achievements_merge_df1
 
     wb.sheets.add('Sheet2')
     team = wb.sheets('Sheet2')
-    team.name = '小组统计'
-    team.range('A1').value = team_merge_df1
+    team.name = '渠道统计'
+    team.range('A1').value = group_merge_df1
 
     wb.sheets.add('Sheet3')
     team = wb.sheets('Sheet3')
-    team.name = '个人到院'
-    team.range('A1').value = grouped_employee_arrive
+    team.name = '小组统计'
+    team.range('A1').value = team_merge_df1
 
     wb.sheets.add('Sheet4')
     team = wb.sheets('Sheet4')
-    team.name = '个人建档'
-    team.range('A1').value = grouped_employee_register
+    team.name = '个人到院'
+    team.range('A1').value = grouped_employee_arrive
 
     wb.sheets.add('Sheet5')
     team = wb.sheets('Sheet5')
-    team.name = '个人业绩'
-    team.range('A1').value = grouped_employee_achievements
+    team.name = '个人建档'
+    team.range('A1').value = grouped_employee_register
 
     wb.sheets.add('Sheet6')
     team = wb.sheets('Sheet6')
-    team.name = '个人咨询'
-    team.range('A1').value = grouped_employee_consult
+    team.name = '个人业绩'
+    team.range('A1').value = grouped_employee_achievements
 
     wb.sheets.add('Sheet7')
     team = wb.sheets('Sheet7')
-    team.name = '嘭嘭针'
-    team.range('A1').value = pengpeng
+    team.name = '个人咨询'
+    team.range('A1').value = grouped_employee_consult
 
 # 访问 https://www.jetbrains.com/help/pycharm/ 获取 PyCharm 帮助

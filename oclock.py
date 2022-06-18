@@ -6,9 +6,10 @@
 # @Date        : 2022-05-05
 # @Comment     : 整点报时
 
+import datetime
+
 import pandas as pd
 import xlwings as xw
-import datetime
 
 import my_global
 
@@ -92,7 +93,6 @@ def group_oclock(date, df=oclock_df):
         x = 0
 
     df = df.groupby('渠道1')['实付'].sum().to_frame()
-    df.to_excel('C:\\Users\\W\\Desktop\\s.xlsx')
     df['日期'] = flag
     df.rename(columns={'实付': '数值'}, inplace=True)
     df = df.reset_index()

@@ -144,10 +144,10 @@ def team_arrive(date, df=arrive_df):
     """
     flag, df = judgement_arrive(date, df)
 
-    if 'flag' in df.columns:
-        df = df.loc[df['flag'] == 1].groupby('所属组').count()['客户ID'].to_frame()
-    else:
-        df = df.groupby('所属组').count()['客户ID'].to_frame()
+    # if 'flag' in df.columns:
+    #     df = df.loc[df['flag'] == 1].groupby('所属组').count()['客户ID'].to_frame()
+    # else:
+    df = df.groupby('所属组').count()['客户ID'].to_frame()
     df['类别'] = '首次来院人数'
     df['日期'] = flag
     df.rename(columns={'客户ID': '数值'}, inplace=True)
@@ -162,7 +162,7 @@ def employee_arrive(df=arrive_df):
     个人到院
     :return:
     """
-    df = df.loc[df['flag'] == 1]
+    # df = df.loc[df['flag'] == 1]
     df = df.loc[df['是否本月'] == True]
 
     df = df.pivot_table(
