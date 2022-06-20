@@ -41,7 +41,7 @@ arrive_df['flag'] = arrive_df.apply(fun, axis=1)
 arrive_df['是否本月'] = arrive_df.apply(lambda x: pd.to_datetime(x['接待时间']).month == my_global.this_month, axis=1)
 
 # 导入去年同期数据(需要更改文件名)
-arrive_df_last_year = pd.read_excel('E:\\data\\7. other\\下载数据导入\\去年\\客户来院查询21_05.xlsx')
+arrive_df_last_year = pd.read_excel('E:\\data\\7. other\\下载数据导入\\去年\\客户来院查询.xlsx')
 # 导入19年同期数据(需要更改文件名)
 arrive_df_19_year = pd.read_excel('E:\\data\\7. other\\下载数据导入\\19年\\客户来院查询.xlsx')
 

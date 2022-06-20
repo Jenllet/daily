@@ -40,7 +40,7 @@ achievements_df['是否本月'] = achievements_df.apply(lambda x: pd.to_datetime
                                                 axis=1)
 
 # 导入去年同期数据(需要更改文件名)
-achievements_df_last_year = pd.read_excel('E:\\data\\7. other\\下载数据导入\\去年\\业绩查询21_05.xlsx')
+achievements_df_last_year = pd.read_excel('E:\\data\\7. other\\下载数据导入\\去年\\业绩查询.xlsx')
 # 导入19年同期数据(需要更改文件名)
 achievements_df_19_year = pd.read_excel('E:\\data\\7. other\\下载数据导入\\19年\\业绩查询.xlsx')
 
