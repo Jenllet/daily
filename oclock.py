@@ -67,10 +67,10 @@ def judgement_arrive(date, df):
         df = df.loc[df['结账时间'] == my_global.now]
         flag = '今日业绩'
     elif date == 'now_week':
-        df = df.loc[df['周'] == my_global.now_week]
+        df = df.loc[df['结账时间'].isin(my_global.this_week_list)]
         flag = '本周业绩'
     elif date == 'yes_week':
-        df = df.loc[df['周'] == my_global.now_week - 1]
+        df = df.loc[df['结账时间'].isin(my_global.last_week_list)]
         flag = '上周业绩'
     else:
         print('date 输入错误。请输入(this_month、now、now_week、yes_week)')
