@@ -21,16 +21,16 @@ this_day = pd.to_datetime(datetime.datetime.now() - datetime.timedelta(days=1)).
 yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
 # 得到7天前的日期
-this_week = (datetime.datetime.now() - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
+this_week_day = (datetime.datetime.now() - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
 
 # 得到14天前的日期
-last_week = (datetime.datetime.now() - datetime.timedelta(days=14)).strftime("%Y-%m-%d")
+last_week_day = (datetime.datetime.now() - datetime.timedelta(days=14)).strftime("%Y-%m-%d")
 
 # 设置近7日时间序列
-this_week_list = pd.date_range(this_week, periods=7).strftime("%Y-%m-%d")
+this_week_list = pd.date_range(this_week_day, periods=7).strftime("%Y-%m-%d")
 
 # 设置上7日时间序列
-last_week_list = pd.date_range(last_week, periods=7).strftime("%Y-%m-%d")
+last_week_list = pd.date_range(last_week_day, periods=7).strftime("%Y-%m-%d")
 
 # 设置当前时间在今年的周数
 now_week = pd.to_datetime(datetime.datetime.now()).week + 1
@@ -72,5 +72,6 @@ dic = {
     '现场咨询三组': '其他',
     '现场咨询四组': '其他',
     '专家助理': '其他',
+    '集团信息部': '其他',
     0: '其他'
 }

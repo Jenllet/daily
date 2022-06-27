@@ -36,7 +36,8 @@ oclock_achievements_df['结账时间'] = oclock_achievements_df['结账时间'].
 oclock_achievements_df['周'] = oclock_achievements_df['结账时间'].map(
     lambda x: pd.to_datetime(x).week + 1)
 oclock_achievements_df['日'] = oclock_achievements_df['结账时间'].map(
-    lambda x: pd.to_datetime(x).day)
+    lambda x: pd.to_datetime(x).weekday())
+oclock_achievements_df.to_excel('C:\\Users\\W\\Desktop\\s.xlsx')
 
 channel = oclock_achievements_df['渠道'].str.split('/', expand=True)
 oclock_achievements_df['渠道1'] = channel[0]
@@ -67,10 +68,10 @@ def judgement_arrive(date, df):
         df = df.loc[df['结账时间'] == my_global.now]
         flag = '今日业绩'
     elif date == 'now_week':
-        df = df.loc[df['结账时间'].isin(my_global.this_week_list)]
+        df = df.loc[df['周'] == my_global.now_week]
         flag = '本周业绩'
     elif date == 'yes_week':
-        df = df.loc[df['结账时间'].isin(my_global.last_week_list)]
+        df = df.loc[(df['周'] == my_global.now_week - 1) & (df['日'] <= datetime.datetime.now().weekday())]
         flag = '上周业绩'
     else:
         print('date 输入错误。请输入(this_month、now、now_week、yes_week)')

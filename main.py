@@ -19,6 +19,7 @@ def print_hi(name):
 
 # 按间距中的绿色按钮以运行脚本。
 if __name__ == '__main__':
+
     # 渠道到院
     grouped_group_arrive_n = arrive.group_arrive('this_month')
     grouped_group_arrive_y = arrive.group_arrive('yesterday')
