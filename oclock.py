@@ -37,7 +37,6 @@ oclock_achievements_df['周'] = oclock_achievements_df['结账时间'].map(
     lambda x: pd.to_datetime(x).week + 1)
 oclock_achievements_df['日'] = oclock_achievements_df['结账时间'].map(
     lambda x: pd.to_datetime(x).weekday())
-oclock_achievements_df.to_excel('C:\\Users\\W\\Desktop\\s.xlsx')
 
 channel = oclock_achievements_df['渠道'].str.split('/', expand=True)
 oclock_achievements_df['渠道1'] = channel[0]
