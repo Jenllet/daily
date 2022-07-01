@@ -128,7 +128,7 @@ def team_oclock(date, df=oclock_df):
     df1['日期'] = flag
     df1.rename(columns={'实付': '数值'}, inplace=True)
     df1 = df1.reset_index()
-    df1 = df1.loc[df1['所属组'].isin(['信息流组', '搜索组', '商城组', '转诊组'])]
+    df1 = df1.loc[df1['所属组'].isin(['信息流组', '搜索组', '商城组', '转诊组', 'IP', '拓客', '订阅号'])]
 
     df2 = df.groupby('渠道3').sum()['实付'].to_frame()
     df2['日期'] = flag
