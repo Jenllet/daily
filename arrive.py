@@ -42,8 +42,10 @@ arrive_df['是否本月'] = arrive_df.apply(lambda x: pd.to_datetime(x['接待�
 
 # 导入去年同期数据(需要更改文件名)
 arrive_df_last_year = pd.read_excel('E:\\data\\7. other\\下载数据导入\\去年\\客户来院查询.xlsx')
+arrive_df_last_year = arrive_df_last_year.drop_duplicates('客户ID')
 # 导入19年同期数据(需要更改文件名)
 arrive_df_19_year = pd.read_excel('E:\\data\\7. other\\下载数据导入\\19年\\客户来院查询.xlsx')
+arrive_df_19_year = arrive_df_19_year.drop_duplicates('客户ID')
 
 
 def judgement_arrive(date, df):
@@ -144,9 +146,22 @@ def team_arrive(date, df=arrive_df):
     """
     flag, df = judgement_arrive(date, df)
 
-    # if 'flag' in df.columns:
-    #     df = df.loc[df['flag'] == 1].groupby('所属组').count()['客户ID'].to_frame()
-    # else:
+    df = df.groupby('所属组').count()['客户ID'].to_frame()
+    df['类别'] = '首次来院人数'
+    df['日期'] = flag
+    df.rename(columns={'客户ID': '数值'}, inplace=True)
+    df = df.reset_index()
+    print('小组到院数据读取成功')
+    return df
+
+def team_arrive_for_system(date, df=arrive_df):
+    """
+    得到小组到院数
+    :param date:日期控制变量
+    :param df:需要编辑的df
+    :return:编辑后的df
+    """
+    flag, df = judgement_arrive(date, df)
     df = df.groupby('所属组').count()['客户ID'].to_frame()
     df['类别'] = '首次来院人数'
     df['日期'] = flag

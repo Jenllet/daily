@@ -140,9 +140,23 @@ def team_register(date, df=register_df):
     """
 
     flag, df = judgement_arrive(date, df)
-    # if 'flag' in df.columns:
-    #     df = df.loc[df['flag'] == 1].groupby('所属组').count()['电话'].to_frame()
-    # else:
+    df = df.groupby('所属组').count()['电话'].to_frame()
+    df['类别'] = '建档人数'
+    df['日期'] = flag
+    df.rename(columns={'电话': '数值'}, inplace=True)
+    df = df.reset_index()
+    print('小组建档数据读取成功')
+    return df
+
+def team_register_for_system(date, df=register_df):
+    """
+    得到小组建档数
+    :param date:日期控制变量
+    :param df:需要编辑的df
+    :return:编辑后的df
+    """
+
+    flag, df = judgement_arrive(date, df)
     df = df.groupby('所属组').count()['电话'].to_frame()
     df['类别'] = '建档人数'
     df['日期'] = flag

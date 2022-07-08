@@ -32,7 +32,7 @@ if __name__ == '__main__':
     grouped_team_arrive_y = arrive.team_arrive('yesterday')
     grouped_team_arrive_tw = arrive.team_arrive('this_week')
     grouped_team_arrive_lw = arrive.team_arrive('last_week')
-    grouped_team_arrive_ly = arrive.team_arrive('last_year', arrive.arrive_df_last_year)
+    grouped_team_arrive_ly = arrive.team_arrive_for_system('last_year', arrive.arrive_df_last_year)
     grouped_team_arrive_19 = arrive.team_arrive('19_year', arrive.arrive_df_19_year)
     # 个人到院
     grouped_employee_arrive = arrive.employee_arrive().reset_index()
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     grouped_team_register_y = register.team_register('yesterday')
     grouped_team_register_tw = register.team_register('this_week')
     grouped_team_register_lw = register.team_register('last_week')
-    grouped_team_register_ly = register.team_register('last_year', register.register_df_last_year)
+    grouped_team_register_ly = register.team_register_for_system('last_year', register.register_df_last_year)
     grouped_team_register_19 = register.team_register('19_year', register.register_df_19_year)
     # 个人建档
     grouped_employee_register = register.employee_register().reset_index()
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     grouped_team_achievements_y = achievements.team_achievements('yesterday')
     grouped_team_achievements_tw = achievements.team_achievements('this_week')
     grouped_team_achievements_lw = achievements.team_achievements('last_week')
-    grouped_team_achievements_ly = achievements.team_achievements('last_year', achievements.achievements_df_last_year)
+    grouped_team_achievements_ly = achievements.team_achievements_for_system('last_year', achievements.achievements_df_last_year)
     grouped_team_achievements_19 = achievements.team_achievements('19_year', achievements.achievements_df_19_year)
     # 个人业绩周环比
     employee_achievements_zhou_tw = achievements.employee_achievements_zhou('this_week')

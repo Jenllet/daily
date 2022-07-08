@@ -140,13 +140,32 @@ def group_achievements(date, df=achievements_df):
 
 def team_achievements(date, df=achievements_df):
     """
-    得到小组建档数
+    得到小组业绩(按咨询师分)
     :param date:日期控制变量
     :param df:需要编辑的df
     :return:编辑后的df
     """
 
     flag, df = judgement_arrive(date, df)
+    df = df.groupby('所属组').sum()['实付'].to_frame()
+    df['类别'] = '新客业绩'
+    df['日期'] = flag
+    df.rename(columns={'实付': '数值'}, inplace=True)
+    df = df.reset_index()
+    print('小组业绩数据读取成功')
+    return df
+
+
+def team_achievements_for_system(date, df=achievements_df):
+    """
+    得到小组业绩(按系统小组名分)
+    :param date:日期控制变量
+    :param df:需要编辑的df
+    :return:编辑后的df
+    """
+
+    flag, df = judgement_arrive(date, df)
+    df['所属组'] = df['所属组'].map(lambda x: my_global.dic[x])
     df = df.groupby('所属组').sum()['实付'].to_frame()
     df['类别'] = '新客业绩'
     df['日期'] = flag
