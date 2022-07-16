@@ -20,9 +20,9 @@ def fun(x):
     return level
 
 
-cs_achievements_df = pd.read_excel('E:\\data\\7. other\\下载数据导入\\业绩查询.xlsx')
+cs_achievements_df = pd.read_excel('F:\\data\\7. other\\下载数据导入\\业绩查询.xlsx')
 
-employee_info_df = pd.read_excel('E:\\data\\5. 资料\\线上客服部名单(2022.5.5).xlsx', sheet_name='Sheet2')
+employee_info_df = pd.read_excel('F:\\data\\5. 资料\\线上客服部名单(2022.5.5).xlsx', sheet_name='Sheet2')
 employee_info_df = employee_info_df[['名单', '渠道', '团队']]
 employee_info_df.rename(columns={'名单': '客服姓名', '渠道': '所属渠道', '团队': '所属组'}, inplace=True)
 
@@ -40,9 +40,9 @@ achievements_df['是否本月'] = achievements_df.apply(lambda x: pd.to_datetime
                                                 axis=1)
 
 # 导入去年同期数据(需要更改文件名)
-achievements_df_last_year = pd.read_excel('E:\\data\\7. other\\下载数据导入\\去年\\业绩查询.xlsx')
+achievements_df_last_year = pd.read_excel('F:\\data\\7. other\\下载数据导入\\去年\\业绩查询.xlsx')
 # 导入19年同期数据(需要更改文件名)
-achievements_df_19_year = pd.read_excel('E:\\data\\7. other\\下载数据导入\\19年\\业绩查询.xlsx')
+achievements_df_19_year = pd.read_excel('F:\\data\\7. other\\下载数据导入\\19年\\业绩查询.xlsx')
 
 
 def judgement_arrive(date, df):

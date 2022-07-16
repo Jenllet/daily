@@ -29,13 +29,13 @@ def base(date):
         print('date 输入错误。请输入(this_month、yesterday、this_week、last_week、last_year)')
 
     paths = [
-        'E:\\data\\7. other\\下载数据导入\\咨询对话量\\{:s}\\电商平台.xlsx'.format(flag),
-        'E:\\data\\7. other\\下载数据导入\\咨询对话量\\{:s}\\社交平台.xlsx'.format(flag),
-        'E:\\data\\7. other\\下载数据导入\\咨询对话量\\{:s}\\搜索平台.xlsx'.format(flag),
-        'E:\\data\\7. other\\下载数据导入\\咨询对话量\\{:s}\\信息流(集团).xlsx'.format(flag)
+        'F:\\data\\7. other\\下载数据导入\\咨询对话量\\{:s}\\电商平台.xlsx'.format(flag),
+        'F:\\data\\7. other\\下载数据导入\\咨询对话量\\{:s}\\社交平台.xlsx'.format(flag),
+        'F:\\data\\7. other\\下载数据导入\\咨询对话量\\{:s}\\搜索平台.xlsx'.format(flag),
+        'F:\\data\\7. other\\下载数据导入\\咨询对话量\\{:s}\\信息流(集团).xlsx'.format(flag)
     ]
 
-    employee_info_df = pd.read_excel('E:\\data\\5. 资料\\线上客服部名单(2022.5.5).xlsx', sheet_name='Sheet2')
+    employee_info_df = pd.read_excel('F:\\data\\5. 资料\\线上客服部名单(2022.5.5).xlsx', sheet_name='Sheet2')
     employee_info_df = employee_info_df[['名单', '渠道', '团队']]
     employee_info_df.rename(columns={'名单': '客服姓名', '渠道': '所属渠道', '团队': '所属组'}, inplace=True)
 

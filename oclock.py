@@ -24,11 +24,11 @@ def fun(x):
     return level
 
 
-employee_info_df = pd.read_excel('E:\\data\\5. 资料\\线上客服部名单(2022.5.5).xlsx', sheet_name='Sheet2')
+employee_info_df = pd.read_excel('F:\\data\\5. 资料\\线上客服部名单(2022.5.5).xlsx', sheet_name='Sheet2')
 employee_info_df = employee_info_df[['名单', '渠道', '团队']]
 employee_info_df.rename(columns={'名单': '客服姓名', '渠道': '所属渠道', '团队': '所属组'}, inplace=True)
 
-oclock_achievements_df = pd.read_excel('E:\\data\\7. other\\下载数据导入\\整点报时\\业绩查询.xlsx')
+oclock_achievements_df = pd.read_excel('F:\\data\\7. other\\下载数据导入\\整点报时\\业绩查询.xlsx')
 oclock_achievements_df = oclock_achievements_df[
     ['客户ID', '结账时间', ' 归属渠道客服', '渠道', '用户组', '分诊意向一级', '分诊意向二级', '分诊意向三级', '实付']]
 oclock_achievements_df['结账时间'] = oclock_achievements_df['结账时间'].map(lambda x: x[0:10])

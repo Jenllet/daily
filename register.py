@@ -21,9 +21,9 @@ def fun(x):
 
 
 # 导入本月数据(不需要更改文件名)
-customer_register_df = pd.read_excel('E:\\data\\7. other\\下载数据导入\\渠道客户查询.xlsx')
+customer_register_df = pd.read_excel('F:\\data\\7. other\\下载数据导入\\渠道客户查询.xlsx')
 # 导入员工数据(推荐每周更新一次)
-employee_info_df = pd.read_excel('E:\\data\\5. 资料\\线上客服部名单(2022.5.5).xlsx', sheet_name='Sheet2')
+employee_info_df = pd.read_excel('F:\\data\\5. 资料\\线上客服部名单(2022.5.5).xlsx', sheet_name='Sheet2')
 employee_info_df = employee_info_df[['名单', '渠道', '团队']]
 employee_info_df.rename(columns={'名单': '客服姓名', '渠道': '所属渠道', '团队': '所属组'}, inplace=True)
 
@@ -40,9 +40,9 @@ register_df['flag'] = register_df.apply(fun, axis=1)
 register_df['是否本月'] = register_df.apply(lambda x: pd.to_datetime(x['建档时间']).month == my_global.this_month, axis=1)
 
 # 导入去年同期数据(需要更改文件名)
-register_df_last_year = pd.read_excel('E:\\data\\7. other\\下载数据导入\\去年\\渠道客户查询.xlsx')
+register_df_last_year = pd.read_excel('F:\\data\\7. other\\下载数据导入\\去年\\渠道客户查询.xlsx')
 # 导入19年同期数据(需要更改文件名)
-register_df_19_year = pd.read_excel('E:\\data\\7. other\\下载数据导入\\19年\\渠道客户查询.xlsx')
+register_df_19_year = pd.read_excel('F:\\data\\7. other\\下载数据导入\\19年\\渠道客户查询.xlsx')
 
 
 def judgement_arrive(date, df):
