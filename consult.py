@@ -31,8 +31,8 @@ def base(date):
     paths = [
         'F:\\data\\7. other\\下载数据导入\\咨询对话量\\{:s}\\电商平台.xlsx'.format(flag),
         'F:\\data\\7. other\\下载数据导入\\咨询对话量\\{:s}\\社交平台.xlsx'.format(flag),
-        'F:\\data\\7. other\\下载数据导入\\咨询对话量\\{:s}\\搜索平台.xlsx'.format(flag),
-        'F:\\data\\7. other\\下载数据导入\\咨询对话量\\{:s}\\信息流(集团).xlsx'.format(flag)
+        'F:\\data\\7. other\\下载数据导入\\咨询对话量\\{:s}\\信息流(集团).xlsx'.format(flag),
+        'F:\\data\\7. other\\下载数据导入\\咨询对话量\\{:s}\\搜索平台.xlsx'.format(flag)
     ]
 
     employee_info_df = pd.read_excel('F:\\data\\5. 资料\\线上客服部名单(2022.5.5).xlsx', sheet_name='Sheet2')
@@ -42,8 +42,9 @@ def base(date):
     def get_excel(path):
         name = Path(path).stem
         df = pd.read_excel(path, header=1)
-        df['Unnamed: 2'] = df['Unnamed: 2'].fillna(method='ffill')
+        # df['Unnamed: 2'] = df['Unnamed: 2'].fillna(method='ffill')
         df['组别'] = df['组别'].fillna(method='ffill')
+        df.drop(df[-12:-1].index)
         df = df[['组别', 'Unnamed: 2', '渠道顾问', '对话量(CRM录入)', '咨询量(CRM录入)', '留联量(CRM录入)']]
         df['渠道1'] = name
         df = pd.merge(df, employee_info_df, left_on='渠道顾问', right_on='客服姓名', how='left')
