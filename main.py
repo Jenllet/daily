@@ -53,6 +53,7 @@ if __name__ == '__main__':
     grouped_team_register_19 = register.team_register('19_year', register.register_df_19_year)
     # 个人建档
     grouped_employee_register = register.employee_register().reset_index()
+    grouped_employee_register_old2new = register.employee_register_old2new().reset_index()
 
     # 渠道业绩
     grouped_group_achievements_n = achievements.group_achievements('this_month')
@@ -173,5 +174,10 @@ if __name__ == '__main__':
     team = wb.sheets('Sheet7')
     team.name = '个人咨询'
     team.range('A1').value = grouped_employee_consult
+
+    wb.sheets.add('Sheet8')
+    team = wb.sheets('Sheet8')
+    team.name = '个人老带新建档'
+    team.range('A1').value = grouped_employee_register_old2new
 
 # 访问 https://www.jetbrains.com/help/pycharm/ 获取 PyCharm 帮助
