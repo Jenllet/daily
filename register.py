@@ -27,7 +27,8 @@ employee_info_df = pd.read_excel('F:\\data\\5. 资料\\线上客服部名单(202
 employee_info_df = employee_info_df[['名单', '渠道', '团队']]
 employee_info_df.rename(columns={'名单': '客服姓名', '渠道': '所属渠道', '团队': '所属组'}, inplace=True)
 
-ana_customer_register_df = customer_register_df[['电话', '建档时间', '渠道客服', '渠道', '一级建档主意向', '二级建档主意向', '三级建档主意向']]
+ana_customer_register_df = customer_register_df[
+    ['电话', '建档时间', '渠道客服', '渠道', '一级建档主意向', '二级建档主意向', '三级建档主意向']]
 ana_customer_register_df['建档时间'] = ana_customer_register_df['建档时间'].map(lambda x: x[0:10])
 
 channel = ana_customer_register_df['渠道'].str.split('/', expand=True)
@@ -37,7 +38,8 @@ ana_customer_register_df['渠道3'] = channel[2]
 register_df = pd.merge(ana_customer_register_df, employee_info_df, left_on='渠道客服', right_on='客服姓名', how='left')
 register_df['flag'] = register_df.apply(fun, axis=1)
 # 判断是否是本月
-register_df['是否本月'] = register_df.apply(lambda x: pd.to_datetime(x['建档时间']).month == my_global.this_month, axis=1)
+register_df['是否本月'] = register_df.apply(lambda x: pd.to_datetime(x['建档时间']).month == my_global.this_month,
+                                            axis=1)
 
 # 导入去年同期数据(需要更改文件名)
 register_df_last_year = pd.read_excel('F:\\data\\7. other\\下载数据导入\\去年\\渠道客户查询.xlsx')
@@ -148,6 +150,7 @@ def team_register(date, df=register_df):
     print('小组建档数据读取成功')
     return df
 
+
 def team_register_for_system(date, df=register_df):
     """
     得到小组建档数
@@ -180,6 +183,25 @@ def employee_register():
         columns='建档时间',
         margins=True,
         margins_name='建档'
+    ).fillna(0)
+    df = df.sort_values(by=['建档时间'], axis=1, ascending=False)
+    print('个人建档数据读取成功')
+    return df
+
+
+def employee_register_old2new():
+    """
+    个人老带新建档
+    :return:
+    """
+    df = register_df.loc[(register_df['是否本月'] == True) & (register_df['渠道2'] == '老带新')]
+    df = df.pivot_table(
+        index=['所属渠道', '所属组', '客服姓名'],
+        values='电话',
+        aggfunc={'电话': 'count'},
+        columns='建档时间',
+        margins=True,
+        margins_name='老带新建档'
     ).fillna(0)
     df = df.sort_values(by=['建档时间'], axis=1, ascending=False)
     print('个人建档数据读取成功')
