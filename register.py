@@ -38,8 +38,7 @@ ana_customer_register_df['渠道3'] = channel[2]
 register_df = pd.merge(ana_customer_register_df, employee_info_df, left_on='渠道客服', right_on='客服姓名', how='left')
 register_df['flag'] = register_df.apply(fun, axis=1)
 # 判断是否是本月
-register_df['是否本月'] = register_df.apply(lambda x: pd.to_datetime(x['建档时间']).month == my_global.this_month,
-                                            axis=1)
+register_df['是否本月'] = register_df.apply(lambda x: pd.to_datetime(x['建档时间']).month == my_global.this_month, axis=1)
 
 # 导入去年同期数据(需要更改文件名)
 register_df_last_year = pd.read_excel('F:\\data\\7. other\\下载数据导入\\去年\\渠道客户查询.xlsx')

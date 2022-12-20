@@ -155,6 +155,8 @@ def team_achievements(date, df=achievements_df):
     print('小组业绩数据读取成功')
     return df
 
+team_achievements('this_month')
+
 
 def team_achievements_for_system(date, df=achievements_df):
     """
@@ -188,6 +190,24 @@ def employee_achievements():
         columns='结账时间',
         margins=True,
         margins_name='业绩'
+    ).fillna(0)
+    df = df.sort_values(by=['结账时间'], axis=1, ascending=False)
+    print('个人业绩数据读取成功')
+    return df
+
+def employee_achievements_old2new():
+    """
+    个人老带新业绩
+    :return:
+    """
+    df = achievements_df.loc[(achievements_df['是否本月'] == True) & (achievements_df['渠道2'] == '老带新')]
+    df = df.pivot_table(
+        index=['所属渠道', '所属组', '客服姓名'],
+        values='实付',
+        aggfunc={'实付': 'sum'},
+        columns='结账时间',
+        margins=True,
+        margins_name='老带新业绩'
     ).fillna(0)
     df = df.sort_values(by=['结账时间'], axis=1, ascending=False)
     print('个人业绩数据读取成功')

@@ -19,23 +19,39 @@ def print_hi(name):
 
 # 按间距中的绿色按钮以运行脚本。
 if __name__ == '__main__':
-
-    # 渠道到院
+    # 渠道首次到院
     grouped_group_arrive_n = arrive.group_arrive('this_month')
     grouped_group_arrive_y = arrive.group_arrive('yesterday')
     grouped_group_arrive_tw = arrive.group_arrive('this_week')
     grouped_group_arrive_lw = arrive.group_arrive('last_week')
     grouped_group_arrive_ly = arrive.group_arrive('last_year', arrive.arrive_df_last_year)
     grouped_group_arrive_19 = arrive.group_arrive('19_year', arrive.arrive_df_19_year)
-    # 小组到院
+    # 小组首次到院
     grouped_team_arrive_n = arrive.team_arrive('this_month')
     grouped_team_arrive_y = arrive.team_arrive('yesterday')
     grouped_team_arrive_tw = arrive.team_arrive('this_week')
     grouped_team_arrive_lw = arrive.team_arrive('last_week')
-    grouped_team_arrive_ly = arrive.team_arrive_for_system('last_year', arrive.arrive_df_last_year)
+    grouped_team_arrive_ly = arrive.team_arrive('last_year', arrive.arrive_df_last_year)
     grouped_team_arrive_19 = arrive.team_arrive('19_year', arrive.arrive_df_19_year)
-    # 个人到院
+    # 个人首次到院
     grouped_employee_arrive = arrive.employee_arrive().reset_index()
+    # 个人来院周环比
+    employee_arrive_zhou_tw = arrive.employee_arrive_zhou('this_week')
+    employee_arrive_zhou_lw = arrive.employee_arrive_zhou('last_week')
+
+    # 渠道到院
+    grouped_group_arrive_total_n = arrive.group_arrive_total('this_month')
+    grouped_group_arrive_total_y = arrive.group_arrive_total('yesterday')
+    grouped_group_arrive_total_tw = arrive.group_arrive_total('this_week')
+    grouped_group_arrive_total_lw = arrive.group_arrive_total('last_week')
+    grouped_group_arrive_total_ly = arrive.group_arrive_total('last_year', arrive.arrive_df_last_year)
+    # 小组到院
+    grouped_team_arrive_total_n = arrive.team_arrive_total('this_month')
+    grouped_team_arrive_total_y = arrive.team_arrive_total('yesterday')
+    grouped_team_arrive_total_tw = arrive.team_arrive_total('this_week')
+    grouped_team_arrive_total_lw = arrive.team_arrive_total('last_week')
+    grouped_team_arrive_total_ly = arrive.team_arrive_total('last_year', arrive.arrive_df_last_year)
+
 
     # 渠道建档
     grouped_group_register_n = register.group_register('this_month')
@@ -49,7 +65,7 @@ if __name__ == '__main__':
     grouped_team_register_y = register.team_register('yesterday')
     grouped_team_register_tw = register.team_register('this_week')
     grouped_team_register_lw = register.team_register('last_week')
-    grouped_team_register_ly = register.team_register_for_system('last_year', register.register_df_last_year)
+    grouped_team_register_ly = register.team_register('last_year', register.register_df_last_year)
     grouped_team_register_19 = register.team_register('19_year', register.register_df_19_year)
     # 个人建档
     grouped_employee_register = register.employee_register().reset_index()
@@ -67,13 +83,15 @@ if __name__ == '__main__':
     grouped_team_achievements_y = achievements.team_achievements('yesterday')
     grouped_team_achievements_tw = achievements.team_achievements('this_week')
     grouped_team_achievements_lw = achievements.team_achievements('last_week')
-    grouped_team_achievements_ly = achievements.team_achievements_for_system('last_year', achievements.achievements_df_last_year)
+    grouped_team_achievements_ly = achievements.team_achievements_for_system('last_year',
+                                                                             achievements.achievements_df_last_year)
     grouped_team_achievements_19 = achievements.team_achievements('19_year', achievements.achievements_df_19_year)
     # 个人业绩周环比
     employee_achievements_zhou_tw = achievements.employee_achievements_zhou('this_week')
     employee_achievements_zhou_lw = achievements.employee_achievements_zhou('last_week')
     # 个人业绩
     grouped_employee_achievements = achievements.employee_achievements().reset_index()
+    grouped_employee_achievements_lod2new = achievements.employee_achievements_old2new().reset_index()
 
     # 渠道咨询
     grouped_group_consult_n = consult.group_df('this_month')
@@ -94,6 +112,8 @@ if __name__ == '__main__':
 
     group_merges1 = [grouped_group_arrive_n, grouped_group_arrive_y, grouped_group_arrive_tw, grouped_group_arrive_lw,
                      grouped_group_arrive_ly, grouped_group_arrive_19,
+                     grouped_group_arrive_total_n, grouped_group_arrive_total_y, grouped_group_arrive_total_tw,
+                     grouped_group_arrive_total_lw, grouped_group_arrive_total_ly,
                      grouped_group_register_n, grouped_group_register_y, grouped_group_register_tw,
                      grouped_group_register_lw, grouped_group_register_ly, grouped_group_register_19,
                      grouped_group_achievements_n, grouped_group_achievements_y, grouped_group_achievements_tw,
@@ -103,6 +123,8 @@ if __name__ == '__main__':
 
     team_merges1 = [grouped_team_arrive_n, grouped_team_arrive_y, grouped_team_arrive_tw, grouped_team_arrive_lw,
                     grouped_team_arrive_ly, grouped_team_arrive_19,
+                    grouped_team_arrive_total_n, grouped_team_arrive_total_y, grouped_team_arrive_total_tw,
+                    grouped_team_arrive_total_lw, grouped_team_arrive_total_ly,
                     grouped_team_register_n, grouped_team_register_y, grouped_team_register_tw,
                     grouped_team_register_lw, grouped_team_register_ly, grouped_team_register_19,
                     grouped_team_achievements_n, grouped_team_achievements_y, grouped_team_achievements_tw,
@@ -110,7 +132,7 @@ if __name__ == '__main__':
                     grouped_team_consult_n, grouped_team_consult_y, grouped_team_consult_tw, grouped_team_consult_lw,
                     grouped_team_consult_ly, grouped_team_consult_19]
 
-    achievements_merges1 = [employee_achievements_zhou_tw, employee_achievements_zhou_lw]
+    achievements_merges1 = [employee_achievements_zhou_tw, employee_achievements_zhou_lw, employee_arrive_zhou_tw, employee_arrive_zhou_lw]
 
     # 渠道统计
     group_merge_df1 = pd.concat(group_merges1)
@@ -135,9 +157,6 @@ if __name__ == '__main__':
         values=['数值', '日期'],
         columns=['日期']
     ).reset_index()
-
-    # 嘭嘭针统计
-    pengpeng = arrive.employee_arrive_pengpeng()
 
     wb = xw.Book()
 
@@ -179,5 +198,10 @@ if __name__ == '__main__':
     team = wb.sheets('Sheet8')
     team.name = '个人老带新建档'
     team.range('A1').value = grouped_employee_register_old2new
+
+    wb.sheets.add('Sheet9')
+    team = wb.sheets('Sheet9')
+    team.name = '个人老带新业绩'
+    team.range('A1').value = grouped_employee_achievements_lod2new
 
 # 访问 https://www.jetbrains.com/help/pycharm/ 获取 PyCharm 帮助

@@ -28,7 +28,7 @@ employee_info_df = employee_info_df[['名单', '渠道', '团队']]
 employee_info_df.rename(columns={'名单': '客服姓名', '渠道': '所属渠道', '团队': '所属组'}, inplace=True)
 
 ana_customer_arrive_df = customer_arrive_df[
-    ['客户ID', '接待时间', ' 归属渠道客服', '渠道', '分诊意向一级', '分诊意向二级', '分诊意向三级']
+    ['客户ID', '接待时间', ' 归属渠道客服', '渠道', '分诊意向一级', '分诊意向二级', '分诊意向三级', '首次/二次来院']
 ]
 ana_customer_arrive_df['接待时间'] = ana_customer_arrive_df['接待时间'].map(lambda x: x[0:10])
 channel = ana_customer_arrive_df['渠道'].str.split('/', expand=True)
@@ -36,7 +36,7 @@ ana_customer_arrive_df['渠道1'] = channel[0]
 ana_customer_arrive_df['渠道2'] = channel[1]
 ana_customer_arrive_df['渠道3'] = channel[2]
 arrive_df = pd.merge(ana_customer_arrive_df, employee_info_df, left_on=' 归属渠道客服', right_on='客服姓名', how='left')
-arrive_df = arrive_df.drop_duplicates('客户ID')
+# arrive_df = arrive_df.drop_duplicates('客户ID')
 arrive_df['flag'] = arrive_df.apply(fun, axis=1)
 arrive_df['是否本月'] = arrive_df.apply(lambda x: pd.to_datetime(x['接待时间']).month == my_global.this_month, axis=1)
 
@@ -110,13 +110,14 @@ def judgement_arrive(date, df):
 
 def group_arrive(date, df=arrive_df):
     """
-    渠道到院数
+    渠道首次到院数
     :param df:
     :param date: 判定df时间
     :return: 编辑好的df
     """
+    df = df.loc[df['首次/二次来院'] == '首次']
+    df = df.drop_duplicates('客户ID')
     flag, df = judgement_arrive(date, df)
-
     # 得到搜索平台/信息流的数据
     x = df.loc[(df['渠道1'] == '搜索平台') & (df['渠道2'] == '信息流')]
     x = x.groupby('渠道1').count()['客户ID'].to_frame()['客户ID'].values
@@ -129,7 +130,38 @@ def group_arrive(date, df=arrive_df):
     df = df.reset_index()
     df = df.loc[df['渠道1'].isin(my_global.groups)]
     if '信息流(集团)' not in list(df['渠道1']):
-        df = df.append(pd.DataFrame([['信息流(集团)', 0, '新客到院数', flag]], columns=['渠道1', '数值', '类别', '日期']))
+        df = df.append(
+            pd.DataFrame([['信息流(集团)', 0, '新客到院数', flag]], columns=['渠道1', '数值', '类别', '日期']))
+    # 增加信息流数据 减少搜索平台
+    df.loc[df['渠道1'] == '信息流(集团)', '数值'] = df.loc[df['渠道1'] == '信息流(集团)']['数值'] + x
+    df.loc[df['渠道1'] == '搜索平台', '数值'] = df.loc[df['渠道1'] == '搜索平台']['数值'] - x
+    print('渠道到院数据读取成功')
+    return df
+
+
+def group_arrive_total(date, df=arrive_df):
+    """
+    渠道到院数
+    :param df:
+    :param date: 判定df时间
+    :return: 编辑好的df
+    """
+    df = df.drop_duplicates('客户ID')
+    flag, df = judgement_arrive(date, df)
+    # 得到搜索平台/信息流的数据
+    x = df.loc[(df['渠道1'] == '搜索平台') & (df['渠道2'] == '信息流')]
+    x = x.groupby('渠道1').count()['客户ID'].to_frame()['客户ID'].values
+    if len(x) == 0:
+        x = 0
+    df = df.groupby('渠道1').count()['客户ID'].to_frame()
+    df['类别'] = '来院人数'
+    df['日期'] = flag
+    df.rename(columns={'客户ID': '数值'}, inplace=True)
+    df = df.reset_index()
+    df = df.loc[df['渠道1'].isin(my_global.groups)]
+    if '信息流(集团)' not in list(df['渠道1']):
+        df = df.append(
+            pd.DataFrame([['信息流(集团)', 0, '新客到院数', flag]], columns=['渠道1', '数值', '类别', '日期']))
     # 增加信息流数据 减少搜索平台
     df.loc[df['渠道1'] == '信息流(集团)', '数值'] = df.loc[df['渠道1'] == '信息流(集团)']['数值'] + x
     df.loc[df['渠道1'] == '搜索平台', '数值'] = df.loc[df['渠道1'] == '搜索平台']['数值'] - x
@@ -139,13 +171,14 @@ def group_arrive(date, df=arrive_df):
 
 def team_arrive(date, df=arrive_df):
     """
-    得到小组到院数
+    得到小组首次到院数
     :param date:日期控制变量
     :param df:需要编辑的df
     :return:编辑后的df
     """
+    df = df.loc[df['首次/二次来院'] == '首次']
+    df = df.drop_duplicates('客户ID')
     flag, df = judgement_arrive(date, df)
-
     df = df.groupby('所属组').count()['客户ID'].to_frame()
     df['类别'] = '首次来院人数'
     df['日期'] = flag
@@ -154,16 +187,18 @@ def team_arrive(date, df=arrive_df):
     print('小组到院数据读取成功')
     return df
 
-def team_arrive_for_system(date, df=arrive_df):
+
+def team_arrive_total(date, df=arrive_df):
     """
     得到小组到院数
     :param date:日期控制变量
     :param df:需要编辑的df
     :return:编辑后的df
     """
+    df = df.drop_duplicates('客户ID')
     flag, df = judgement_arrive(date, df)
     df = df.groupby('所属组').count()['客户ID'].to_frame()
-    df['类别'] = '首次来院人数'
+    df['类别'] = '来院人数'
     df['日期'] = flag
     df.rename(columns={'客户ID': '数值'}, inplace=True)
     df = df.reset_index()
@@ -174,16 +209,16 @@ def team_arrive_for_system(date, df=arrive_df):
 # 个人到院
 def employee_arrive(df=arrive_df):
     """
-    个人到院
+    个人首次到院
     :return:
     """
-    # df = df.loc[df['flag'] == 1]
+    df = df.loc[df['首次/二次来院'] == '首次']
+    df = df.drop_duplicates('客户ID')
     df = df.loc[df['是否本月'] == True]
-
     df = df.pivot_table(
         index=['所属渠道', '所属组', '客服姓名'],
         values='客户ID',
-        aggfunc={'客户ID': 'count'},
+        aggfunc=lambda x: len(x.unique()),
         columns='接待时间',
         margins=True,
         margins_name='到院'
@@ -192,24 +227,18 @@ def employee_arrive(df=arrive_df):
     print('个人到院数据读取成功')
     return df
 
-
-# 嘭嘭针
-def employee_arrive_pengpeng(df=arrive_df):
+def employee_arrive_zhou(date, df=arrive_df):
     """
-    嘭嘭针
+    个人首次到院周统计
     :return:
     """
-    df = df.loc[df['接待时间'] == my_global.yesterday]
-    # df = df.loc[df['是否本月'] == True]
-    df['重点项目二级'] = df['分诊意向一级'] + df['分诊意向二级']
-    df['重点项目三级'] = df['分诊意向一级'] + df['分诊意向二级'] + df['分诊意向三级']
-    df = df.loc[df['重点项目二级'].isin(my_global.key_program) | df['重点项目三级'].isin(my_global.key_program)]
-    df.drop_duplicates('客户ID')
-    df = df.loc[df['flag'] == 1].pivot_table(
-        index=['所属渠道', '所属组', '客服姓名'],
-        values='客户ID',
-        aggfunc={'客户ID': 'count'},
-        columns='接待时间'
-    ).fillna(0)
-    print('个人到院数据读取成功')
+    df = df.loc[df['首次/二次来院'] == '首次']
+    df = df.drop_duplicates('客户ID')
+    flag, df = judgement_arrive(date, df)
+    df = df.groupby('客服姓名').count()['客户ID'].to_frame()
+    df['类别'] = '首次来院'
+    df['日期'] = flag
+    df.rename(columns={'客户ID': '数值'}, inplace=True)
+    df = df.reset_index()
+    print('个人首次来院周统计数据读取成功')
     return df
