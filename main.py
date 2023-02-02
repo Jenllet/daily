@@ -34,7 +34,8 @@ if __name__ == '__main__':
     grouped_team_arrive_ly = arrive.team_arrive('last_year', arrive.arrive_df_last_year)
     grouped_team_arrive_19 = arrive.team_arrive('19_year', arrive.arrive_df_19_year)
     # 个人首次到院
-    grouped_employee_arrive = arrive.employee_arrive().reset_index()
+    employee_employee_arrive = arrive.employee_arrive().reset_index()
+    employee_employee_arrive_old2new = arrive.employee_arrive_old2new().reset_index()
     # 个人来院周环比
     employee_arrive_zhou_tw = arrive.employee_arrive_zhou('this_week')
     employee_arrive_zhou_lw = arrive.employee_arrive_zhou('last_week')
@@ -177,7 +178,7 @@ if __name__ == '__main__':
     wb.sheets.add('Sheet4')
     team = wb.sheets('Sheet4')
     team.name = '个人到院'
-    team.range('A1').value = grouped_employee_arrive
+    team.range('A1').value = employee_employee_arrive
 
     wb.sheets.add('Sheet5')
     team = wb.sheets('Sheet5')
@@ -203,5 +204,10 @@ if __name__ == '__main__':
     team = wb.sheets('Sheet9')
     team.name = '个人老带新业绩'
     team.range('A1').value = grouped_employee_achievements_lod2new
+
+    wb.sheets.add('Sheet10')
+    team = wb.sheets('Sheet10')
+    team.name = '个人老带新首次来院'
+    team.range('A1').value = employee_employee_arrive_old2new
 
 # 访问 https://www.jetbrains.com/help/pycharm/ 获取 PyCharm 帮助

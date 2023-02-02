@@ -227,6 +227,7 @@ def employee_arrive(df=arrive_df):
     print('个人到院数据读取成功')
     return df
 
+
 def employee_arrive_zhou(date, df=arrive_df):
     """
     个人首次到院周统计
@@ -241,4 +242,24 @@ def employee_arrive_zhou(date, df=arrive_df):
     df.rename(columns={'客户ID': '数值'}, inplace=True)
     df = df.reset_index()
     print('个人首次来院周统计数据读取成功')
+    return df
+
+
+def employee_arrive_old2new():
+    """
+    个人老带新首次来院
+    :return:
+    """
+    df = arrive_df.loc[arrive_df['首次/二次来院'] == '首次']
+    df = arrive_df.loc[(arrive_df['是否本月'] == True) & (arrive_df['渠道2'] == '老带新')]
+    df = df.pivot_table(
+        index=['所属渠道', '所属组', '客服姓名'],
+        values='客户ID',
+        aggfunc={'客户ID': 'count'},
+        columns='接待时间',
+        margins=True,
+        margins_name='老带新到院'
+    ).fillna(0)
+    df = df.sort_values(by=['接待时间'], axis=1, ascending=False)
+    print('个人老带新首次到院数据读取成功')
     return df
