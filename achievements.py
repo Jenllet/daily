@@ -26,18 +26,23 @@ employee_info_df = pd.read_excel('F:\\data\\5. 资料\\线上客服部名单(202
 employee_info_df = employee_info_df[['名单', '渠道', '团队']]
 employee_info_df.rename(columns={'名单': '客服姓名', '渠道': '所属渠道', '团队': '所属组'}, inplace=True)
 
-ana_cs_achievements_df = cs_achievements_df[['客户ID', '结账时间', ' 归属渠道客服', '渠道', '分诊意向一级', '分诊意向二级', '分诊意向三级', '实付']]
+ana_cs_achievements_df = cs_achievements_df[
+    ['客户ID', '结账时间', ' 归属渠道客服', '渠道', '分诊意向一级', '分诊意向二级', '分诊意向三级', '实付']]
+ana_cs_achievements_df['月'] = ana_cs_achievements_df['结账时间'].map(lambda x: pd.to_datetime(x).month)
+ana_cs_achievements_df['日'] = ana_cs_achievements_df['结账时间'].map(lambda x: pd.to_datetime(x).day)
 ana_cs_achievements_df['结账时间'] = ana_cs_achievements_df['结账时间'].map(lambda x: x[0:10])
 
 channel = ana_cs_achievements_df['渠道'].str.split('/', expand=True)
 ana_cs_achievements_df['渠道1'] = channel[0]
 ana_cs_achievements_df['渠道2'] = channel[1]
 ana_cs_achievements_df['渠道3'] = channel[2]
-achievements_df = pd.merge(ana_cs_achievements_df, employee_info_df, left_on=' 归属渠道客服', right_on='客服姓名', how='left')
+achievements_df = pd.merge(ana_cs_achievements_df, employee_info_df, left_on=' 归属渠道客服', right_on='客服姓名',
+                           how='left')
 achievements_df['flag'] = achievements_df.apply(fun, axis=1)
 # 判断是否是本月
-achievements_df['是否本月'] = achievements_df.apply(lambda x: pd.to_datetime(x['结账时间']).month == my_global.this_month,
-                                                axis=1)
+achievements_df['是否本月'] = achievements_df.apply(
+    lambda x: pd.to_datetime(x['结账时间']).month == my_global.this_month,
+    axis=1)
 
 # 导入去年同期数据(需要更改文件名)
 achievements_df_last_year = pd.read_excel('F:\\data\\7. other\\下载数据导入\\去年\\业绩查询.xlsx')
@@ -64,6 +69,9 @@ def judgement_arrive(date, df):
     elif date == 'last_week':
         df = df.loc[df['结账时间'].isin(my_global.last_week_list)]
         flag = '上7日'
+    elif date == 'last_month':
+        df = df.loc[(df['月'] == my_global.last_month) & (df['日'] <= my_global.this_day)]
+        flag = '上月同期'
     elif date == 'last_year':
         df = df[
             ['客户ID', '结账时间', '渠道', '用户组', '分诊意向一级', '分诊意向二级', '分诊意向三级', '实付']
@@ -115,7 +123,8 @@ def group_achievements(date, df=achievements_df):
     flag, df = judgement_arrive(date, df)
 
     if '信息流(集团)' not in list(df['渠道1']):
-        df = df.append(pd.DataFrame([['信息流(集团)', 0, '新客到院数', flag]], columns=['渠道1', '数值', '类别', '日期']))
+        df = df.append(
+            pd.DataFrame([['信息流(集团)', 0, '新客到院数', flag]], columns=['渠道1', '数值', '类别', '日期']))
     # 得到搜索平台/信息流的数据
     x = df.loc[(df['渠道1'] == '搜索平台') & (df['渠道2'] == '信息流')]
     x = x.groupby('渠道1').sum()['实付'].to_frame()['实付'].values
@@ -154,6 +163,7 @@ def team_achievements(date, df=achievements_df):
     df = df.reset_index()
     print('小组业绩数据读取成功')
     return df
+
 
 team_achievements('this_month')
 
@@ -195,6 +205,7 @@ def employee_achievements():
     print('个人业绩数据读取成功')
     return df
 
+
 def employee_achievements_old2new():
     """
     个人老带新业绩
@@ -222,6 +233,22 @@ def employee_achievements_zhou(date, df=achievements_df):
     flag, df = judgement_arrive(date, df)
     df = df.groupby('客服姓名').sum()['实付'].to_frame()
     df['类别'] = '新客业绩'
+    df['日期'] = flag
+    df.rename(columns={'实付': '数值'}, inplace=True)
+    df = df.reset_index()
+    print('个人业绩周统计数据读取成功')
+    return df
+
+
+def employee_achievements_old2new_month(date, df=achievements_df):
+    """
+    个人业绩周统计
+    :return:
+    """
+    flag, df = judgement_arrive(date, df)
+    df = df.loc[df['渠道2'] == '老带新']
+    df = df.groupby('客服姓名').sum()['实付'].to_frame()
+    df['类别'] = '老客业绩'
     df['日期'] = flag
     df.rename(columns={'实付': '数值'}, inplace=True)
     df = df.reset_index()

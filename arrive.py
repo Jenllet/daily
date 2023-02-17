@@ -30,6 +30,8 @@ employee_info_df.rename(columns={'名单': '客服姓名', '渠道': '所属渠�
 ana_customer_arrive_df = customer_arrive_df[
     ['客户ID', '接待时间', ' 归属渠道客服', '渠道', '分诊意向一级', '分诊意向二级', '分诊意向三级', '首次/二次来院']
 ]
+ana_customer_arrive_df['月'] = ana_customer_arrive_df['接待时间'].map(lambda x: pd.to_datetime(x).month)
+ana_customer_arrive_df['日'] = ana_customer_arrive_df['接待时间'].map(lambda x: pd.to_datetime(x).day)
 ana_customer_arrive_df['接待时间'] = ana_customer_arrive_df['接待时间'].map(lambda x: x[0:10])
 channel = ana_customer_arrive_df['渠道'].str.split('/', expand=True)
 ana_customer_arrive_df['渠道1'] = channel[0]
@@ -68,6 +70,9 @@ def judgement_arrive(date, df):
     elif date == 'last_week':
         df = df.loc[df['接待时间'].isin(my_global.last_week_list)]
         flag = '上7日'
+    elif date == 'last_month':
+        df = df.loc[(df['月'] == my_global.last_month) & (df['日'] <= my_global.this_day)]
+        flag = '上月同期'
     elif date == 'last_year':
         df = df[
             ['客户ID', '接待时间', '渠道', '用户组', '分诊意向一级', '分诊意向二级', '分诊意向三级']
@@ -262,4 +267,22 @@ def employee_arrive_old2new():
     ).fillna(0)
     df = df.sort_values(by=['接待时间'], axis=1, ascending=False)
     print('个人老带新首次到院数据读取成功')
+    return df
+
+
+def employee_arrive_zhou_month(date, df=arrive_df):
+    """
+    个人老带新到院月统计
+    :return:
+    """
+    df = df.loc[df['首次/二次来院'] == '首次']
+    df = df.loc[df['渠道2'] == '老带新']
+    df = df.drop_duplicates('客户ID')
+    flag, df = judgement_arrive(date, df)
+    df = df.groupby('客服姓名').count()['客户ID'].to_frame()
+    df['类别'] = '老客来院'
+    df['日期'] = flag
+    df.rename(columns={'客户ID': '数值'}, inplace=True)
+    df = df.reset_index()
+    print('个人首次来院周统计数据读取成功')
     return df

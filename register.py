@@ -29,6 +29,8 @@ employee_info_df.rename(columns={'名单': '客服姓名', '渠道': '所属渠�
 
 ana_customer_register_df = customer_register_df[
     ['电话', '建档时间', '渠道客服', '渠道', '一级建档主意向', '二级建档主意向', '三级建档主意向']]
+ana_customer_register_df['月'] = ana_customer_register_df['建档时间'].map(lambda x: pd.to_datetime(x).month)
+ana_customer_register_df['日'] = ana_customer_register_df['建档时间'].map(lambda x: pd.to_datetime(x).day)
 ana_customer_register_df['建档时间'] = ana_customer_register_df['建档时间'].map(lambda x: x[0:10])
 
 channel = ana_customer_register_df['渠道'].str.split('/', expand=True)
@@ -65,6 +67,9 @@ def judgement_arrive(date, df):
     elif date == 'last_week':
         df = df.loc[df['建档时间'].isin(my_global.last_week_list)]
         flag = '上7日'
+    elif date == 'last_month':
+        df = df.loc[(df['月'] == my_global.last_month) & (df['日'] <= my_global.this_day)]
+        flag = '上月同期'
     elif date == 'last_year':
         df = df[
             ['电话', '建档时间', '渠道', '渠道客服组织', '一级建档主意向', '二级建档主意向', '三级建档主意向']
@@ -204,4 +209,19 @@ def employee_register_old2new():
     ).fillna(0)
     df = df.sort_values(by=['建档时间'], axis=1, ascending=False)
     print('个人建档数据读取成功')
+    return df
+
+def employee_register_old2new_month(date, df=register_df):
+    """
+    个人老带新到院月统计
+    :return:
+    """
+    df = df.loc[df['渠道2'] == '老带新']
+    flag, df = judgement_arrive(date, df)
+    df = df.groupby('客服姓名').count()['电话'].to_frame()
+    df['类别'] = '老客建档'
+    df['日期'] = flag
+    df.rename(columns={'电话': '数值'}, inplace=True)
+    df = df.reset_index()
+    print('个人建档数据读取成')
     return df
