@@ -40,7 +40,8 @@ ana_customer_register_df['渠道3'] = channel[2]
 register_df = pd.merge(ana_customer_register_df, employee_info_df, left_on='渠道客服', right_on='客服姓名', how='left')
 register_df['flag'] = register_df.apply(fun, axis=1)
 # 判断是否是本月
-register_df['是否本月'] = register_df.apply(lambda x: pd.to_datetime(x['建档时间']).month == my_global.this_month, axis=1)
+register_df['是否本月'] = register_df.apply(lambda x: pd.to_datetime(x['建档时间']).month == my_global.this_month,
+                                            axis=1)
 
 # 导入去年同期数据(需要更改文件名)
 register_df_last_year = pd.read_excel('F:\\data\\7. other\\下载数据导入\\去年\\渠道客户查询.xlsx')
@@ -109,14 +110,15 @@ def judgement_arrive(date, df):
     return flag, df
 
 
-def group_register(date, df=register_df):
+def group_register(date):
     """
     渠道建档数
+    :param j:
     :param df:
     :param date: 判定df时间
     :return: 编辑好的df
     """
-    flag, df = judgement_arrive(date, df)
+    flag, df = judgement_arrive(date=date, df=register_df)
     # 得到搜索平台/信息流的数据
     x = df.loc[(df['渠道1'] == '搜索平台') & (df['渠道2'] == '信息流')]
     x = x.groupby('渠道1').count()['电话'].to_frame()['电话'].values
@@ -193,24 +195,6 @@ def employee_register():
     return df
 
 
-def employee_register_old2new():
-    """
-    个人老带新建档
-    :return:
-    """
-    df = register_df.loc[(register_df['是否本月'] == True) & (register_df['渠道2'] == '老带新')]
-    df = df.pivot_table(
-        index=['所属渠道', '所属组', '客服姓名'],
-        values='电话',
-        aggfunc={'电话': 'count'},
-        columns='建档时间',
-        margins=True,
-        margins_name='老带新建档'
-    ).fillna(0)
-    df = df.sort_values(by=['建档时间'], axis=1, ascending=False)
-    print('个人建档数据读取成功')
-    return df
-
 def employee_register_old2new_month(date, df=register_df):
     """
     个人老带新到院月统计
@@ -218,10 +202,10 @@ def employee_register_old2new_month(date, df=register_df):
     """
     df = df.loc[df['渠道2'] == '老带新']
     flag, df = judgement_arrive(date, df)
-    df = df.groupby('客服姓名').count()['电话'].to_frame()
-    df['类别'] = '老客建档'
+    df = df.groupby(['所属渠道', '所属组', '客服姓名']).count()['电话'].to_frame()
+    df['类别'] = '老带新建档'
     df['日期'] = flag
     df.rename(columns={'电话': '数值'}, inplace=True)
     df = df.reset_index()
-    print('个人建档数据读取成')
+    print('个人老带新建档数据读取成')
     return df

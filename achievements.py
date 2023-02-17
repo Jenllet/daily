@@ -27,7 +27,7 @@ employee_info_df = employee_info_df[['名单', '渠道', '团队']]
 employee_info_df.rename(columns={'名单': '客服姓名', '渠道': '所属渠道', '团队': '所属组'}, inplace=True)
 
 ana_cs_achievements_df = cs_achievements_df[
-    ['客户ID', '结账时间', ' 归属渠道客服', '渠道', '分诊意向一级', '分诊意向二级', '分诊意向三级', '实付']]
+    ['客户ID', '结账时间', ' 归属渠道客服', '渠道', '分诊意向一级', '分诊意向二级', '分诊意向三级', '实付', '建档时间']]
 ana_cs_achievements_df['月'] = ana_cs_achievements_df['结账时间'].map(lambda x: pd.to_datetime(x).month)
 ana_cs_achievements_df['日'] = ana_cs_achievements_df['结账时间'].map(lambda x: pd.to_datetime(x).day)
 ana_cs_achievements_df['结账时间'] = ana_cs_achievements_df['结账时间'].map(lambda x: x[0:10])
@@ -39,6 +39,12 @@ ana_cs_achievements_df['渠道3'] = channel[2]
 achievements_df = pd.merge(ana_cs_achievements_df, employee_info_df, left_on=' 归属渠道客服', right_on='客服姓名',
                            how='left')
 achievements_df['flag'] = achievements_df.apply(fun, axis=1)
+
+# 判断是否是本月建档本月来院
+achievements_df['是否本月建档业绩'] = achievements_df.apply(
+    lambda x: ((pd.to_datetime(x['建档时间']).month == my_global.this_month) & (pd.to_datetime(
+        x['建档时间']).year == my_global.this_year)), axis=1)
+
 # 判断是否是本月
 achievements_df['是否本月'] = achievements_df.apply(
     lambda x: pd.to_datetime(x['结账时间']).month == my_global.this_month,
@@ -58,7 +64,7 @@ def judgement_arrive(date, df):
     :return: 返回时间和df
     """
     if date == 'this_month':
-        df = df.loc[df['是否本月'] == True]
+        df = df.loc[df['月'] == my_global.this_month]
         flag = '截止昨日'
     elif date == 'yesterday':
         df = df.loc[df['结账时间'] == my_global.yesterday]
@@ -113,15 +119,17 @@ def judgement_arrive(date, df):
     return flag, df
 
 
-def group_achievements(date, df=achievements_df):
+def group_achievements(date, df=achievements_df, j='p'):
     """
     渠道业绩
+    :param j:
     :param df:
     :param date: 判定df时间
     :return: 编辑好的df
     """
-    flag, df = judgement_arrive(date, df)
-
+    flag, df = judgement_arrive(date=date, df=df)
+    if j == 'o2n':
+        df = df.loc[df['渠道2'] == '老带新']
     if '信息流(集团)' not in list(df['渠道1']):
         df = df.append(
             pd.DataFrame([['信息流(集团)', 0, '新客到院数', flag]], columns=['渠道1', '数值', '类别', '日期']))
@@ -206,25 +214,6 @@ def employee_achievements():
     return df
 
 
-def employee_achievements_old2new():
-    """
-    个人老带新业绩
-    :return:
-    """
-    df = achievements_df.loc[(achievements_df['是否本月'] == True) & (achievements_df['渠道2'] == '老带新')]
-    df = df.pivot_table(
-        index=['所属渠道', '所属组', '客服姓名'],
-        values='实付',
-        aggfunc={'实付': 'sum'},
-        columns='结账时间',
-        margins=True,
-        margins_name='老带新业绩'
-    ).fillna(0)
-    df = df.sort_values(by=['结账时间'], axis=1, ascending=False)
-    print('个人业绩数据读取成功')
-    return df
-
-
 def employee_achievements_zhou(date, df=achievements_df):
     """
     个人业绩周统计
@@ -240,17 +229,23 @@ def employee_achievements_zhou(date, df=achievements_df):
     return df
 
 
-def employee_achievements_old2new_month(date, df=achievements_df):
+def employee_achievements_old2new_month(date, j="T"):
     """
-    个人业绩周统计
+    个人业绩月统计
     :return:
     """
-    flag, df = judgement_arrive(date, df)
+    flag, df = judgement_arrive(date=date, df=achievements_df)
+
+    if j == "T":
+        s = "老带新业绩"
+    else:
+        s = "本月建档老带新业绩"
+        df = df.loc[df['是否本月建档业绩'] == True]
     df = df.loc[df['渠道2'] == '老带新']
-    df = df.groupby('客服姓名').sum()['实付'].to_frame()
-    df['类别'] = '老客业绩'
+    df = df.groupby(['所属渠道', '所属组', '客服姓名']).sum()['实付'].to_frame()
+    df['类别'] = s
     df['日期'] = flag
     df.rename(columns={'实付': '数值'}, inplace=True)
     df = df.reset_index()
-    print('个人业绩周统计数据读取成功')
+    print('个人业绩月统计数据读取成功')
     return df

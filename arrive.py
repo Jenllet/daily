@@ -28,7 +28,8 @@ employee_info_df = employee_info_df[['名单', '渠道', '团队']]
 employee_info_df.rename(columns={'名单': '客服姓名', '渠道': '所属渠道', '团队': '所属组'}, inplace=True)
 
 ana_customer_arrive_df = customer_arrive_df[
-    ['客户ID', '接待时间', ' 归属渠道客服', '渠道', '分诊意向一级', '分诊意向二级', '分诊意向三级', '首次/二次来院']
+    ['客户ID', '接待时间', ' 归属渠道客服', '渠道', '分诊意向一级', '分诊意向二级', '分诊意向三级', '首次/二次来院',
+     '建档时间']
 ]
 ana_customer_arrive_df['月'] = ana_customer_arrive_df['接待时间'].map(lambda x: pd.to_datetime(x).month)
 ana_customer_arrive_df['日'] = ana_customer_arrive_df['接待时间'].map(lambda x: pd.to_datetime(x).day)
@@ -41,6 +42,11 @@ arrive_df = pd.merge(ana_customer_arrive_df, employee_info_df, left_on=' 归属�
 # arrive_df = arrive_df.drop_duplicates('客户ID')
 arrive_df['flag'] = arrive_df.apply(fun, axis=1)
 arrive_df['是否本月'] = arrive_df.apply(lambda x: pd.to_datetime(x['接待时间']).month == my_global.this_month, axis=1)
+
+# 判断是否是本月建档本月来院
+arrive_df['是否本月建档来院'] = arrive_df.apply(
+    lambda x: ((pd.to_datetime(x['建档时间']).month == my_global.this_month) & (pd.to_datetime(
+        x['建档时间']).year == my_global.this_year)), axis=1)
 
 # 导入去年同期数据(需要更改文件名)
 arrive_df_last_year = pd.read_excel('F:\\data\\7. other\\下载数据导入\\去年\\客户来院查询.xlsx')
@@ -113,14 +119,15 @@ def judgement_arrive(date, df):
     return flag, df
 
 
-def group_arrive(date, df=arrive_df):
+def group_arrive(date):
     """
     渠道首次到院数
+    :param j:
     :param df:
     :param date: 判定df时间
     :return: 编辑好的df
     """
-    df = df.loc[df['首次/二次来院'] == '首次']
+    df = arrive_df.loc[arrive_df['首次/二次来院'] == '首次']
     df = df.drop_duplicates('客户ID')
     flag, df = judgement_arrive(date, df)
     # 得到搜索平台/信息流的数据
@@ -250,39 +257,24 @@ def employee_arrive_zhou(date, df=arrive_df):
     return df
 
 
-def employee_arrive_old2new():
-    """
-    个人老带新首次来院
-    :return:
-    """
-    df = arrive_df.loc[arrive_df['首次/二次来院'] == '首次']
-    df = arrive_df.loc[(arrive_df['是否本月'] == True) & (arrive_df['渠道2'] == '老带新')]
-    df = df.pivot_table(
-        index=['所属渠道', '所属组', '客服姓名'],
-        values='客户ID',
-        aggfunc={'客户ID': 'count'},
-        columns='接待时间',
-        margins=True,
-        margins_name='老带新到院'
-    ).fillna(0)
-    df = df.sort_values(by=['接待时间'], axis=1, ascending=False)
-    print('个人老带新首次到院数据读取成功')
-    return df
-
-
-def employee_arrive_zhou_month(date, df=arrive_df):
+def employee_arrive_zhou_month(date, j="T"):
     """
     个人老带新到院月统计
     :return:
     """
+    flag, df = judgement_arrive(date=date, df=arrive_df)
     df = df.loc[df['首次/二次来院'] == '首次']
     df = df.loc[df['渠道2'] == '老带新']
     df = df.drop_duplicates('客户ID')
-    flag, df = judgement_arrive(date, df)
-    df = df.groupby('客服姓名').count()['客户ID'].to_frame()
-    df['类别'] = '老客来院'
+    if j == "T":
+        s = '老带新来院'
+    else:
+        s = '本月建档老带新来院'
+        df = df.loc[df['是否本月建档来院'] == True]
+    df = df.groupby(['所属渠道', '所属组', '客服姓名']).count()['客户ID'].to_frame()
+    df['类别'] = s
     df['日期'] = flag
     df.rename(columns={'客户ID': '数值'}, inplace=True)
     df = df.reset_index()
-    print('个人首次来院周统计数据读取成功')
+    print('老带新首次来院月统计数据读取成功')
     return df

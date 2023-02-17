@@ -14,6 +14,9 @@ groups = ['信息流(集团)', '搜索平台', '电商平台', '社交平台']
 # 昨天所在的月份
 this_month = pd.to_datetime(datetime.datetime.now() - datetime.timedelta(days=1)).month
 
+# 昨天所在的年份
+this_year = pd.to_datetime(datetime.datetime.now() - datetime.timedelta(days=1)).year
+
 # 上月的月份
 last_month = this_month - 1
 
